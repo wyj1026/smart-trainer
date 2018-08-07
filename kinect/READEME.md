@@ -4,11 +4,13 @@
 
 ##  配置
 
-**Win32 Debug**
+**Win64 Debug**
 
 **Kinect V2 SDK**
 
-**vs项目属性：Kinect.props **
+**vs项目属性：kinect_cv_x64.props**
+
+**opencv3.2**
 
 
 
@@ -45,7 +47,7 @@ JointType_Count = (JointType_ThumbRight + 1)
 
 
 
-![Kinect关节点对应图](C:\Users\Richado\Desktop\Kinect\Kinect关节点对应图.jpg)
+![Kinect关节点对应图](Kinect关节点对应图.jpg)
 
 
 
