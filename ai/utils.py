@@ -8,7 +8,7 @@ def draw_data_frame(df):
     plt.show()
 
 
-def draw_data_frame_split_lines(df, lines):
+def draw_data_frame_with_split_lines(df, lines):
     plt.plot(df)
     for l in lines:
         plt.axvline(l, color="r")
@@ -16,6 +16,7 @@ def draw_data_frame_split_lines(df, lines):
 
 
 def draw_reps(reps):
-    for r in reps:
-        plt.plot(r)
+    for i in range(len(reps)):
+        plt.plot(reps[i], label=i)
+    plt.legend(loc=0)
     plt.show()
