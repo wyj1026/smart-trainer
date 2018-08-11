@@ -25,7 +25,10 @@ class TestPreprocess(unittest.TestCase):
         
         x = segmentation.segment_data_into_repeats(self.data_frame, "NeckY", mn=True, delta=10)
         x = normalization.normalize([np.array(df) for df in x])
-        draw_reps(x)
+        #draw_reps(x)
+        #for i in range(3):
+        #    draw_single_frame(x[0][i])
+        draw_repeat(x[0])
         self.assertEqual(len(x), 10)
 
 

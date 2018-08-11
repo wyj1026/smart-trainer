@@ -72,6 +72,6 @@ def segment_data_into_repeats(data_frame, column, mn=True, delta=20):
     if coord_indexs:
         start = coord_indexs[0]
         for i in range(1, len(coord_indexs)):
-            repeats.append(coords[start: coord_indexs[i]])
+            repeats.append(data_frame[start: coord_indexs[i]])
             start = coord_indexs[i]
     return repeats
