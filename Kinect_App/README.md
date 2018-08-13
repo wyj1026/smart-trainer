@@ -1,4 +1,4 @@
-# Kinect
+# Kinect_App
 
 [TOC]
 
@@ -8,9 +8,27 @@
 
 **Kinect V2 SDK**
 
-**vs项目属性：kinect_cv_x64.props**
+**vs项目属性：Kinect_App.props** *注：有路径要求，可以编辑这个文件，更改成自己的路径*
 
 **opencv3.2**
+
+**Qt5.92** 
+
+
+
+## 代码文件组成
+
+**main.cpp**  运行Kinect_App
+
+**ui_Kinect_App.h ** 运行程序后根据ui文件自动生成的头文件
+
+**Kinect_App.h** 定义了一个窗口类，包含一个ui_Kinect_App.h里的ui，进行界面的初始化和各种函数的声明
+
+**Kinect_App.cpp**上述头文件的的实现文件
+
+
+
+
 
 
 
@@ -59,3 +77,10 @@ TrackingState_Inferred = 1,
 TrackingState_Tracked = 2
 ```
 
+
+
+## 视频流处理
+
+​	connect把timer和getFrame连在一起，timeout()为信号，得到信号就调用getFrame	
+
+​	通过timer的start，开始计时，每50ms调用之前通过connect连接的getframe函数，从kinectsensor中获取图片，处理后转换格式显示到label_2中。其中时间间隔可在start(50)中设置。
