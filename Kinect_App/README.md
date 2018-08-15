@@ -4,7 +4,7 @@
 
 ##  配置
 
-**Win64 Debug**
+**X64 Debug**
 
 **Kinect V2 SDK**
 
@@ -13,6 +13,20 @@
 **opencv3.2**
 
 **Qt5.92** 
+
+**python36**
+
+
+
+## python配置
+
+1. 项目—属性—C/C++—常规—附加包含目录（"...\python36\include"）
+2. 项目—属性—链接器—常规—附加库目录（"...\python36\libs"）
+3. 项目—属性—链接器—输入—附加依赖项 添加python36.lib
+4. 需修改pyconfig.h，替换...\python36\include下的pyconfig.h为本文档附带头文件
+5. 解决QT和python定义冲突，https://blog.csdn.net/a18373279153/article/details/78745084
+
+
 
 
 
@@ -66,6 +80,8 @@ JointType_Count = (JointType_ThumbRight + 1)
 
 
 ![Kinect关节点对应图](Kinect关节点对应图.jpg)
+
+
 
 
 
