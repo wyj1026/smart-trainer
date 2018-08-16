@@ -1,6 +1,22 @@
 # coding: utf-8
 
-from features import squat_features
+import numpy as np
+
+from .features import squat_features
+
+"""
+对蹲起提取基本德特征，包括开始位置、中间位置、结束位置各个关节坐标
+"""
+def extract_basic_features(squats, key="NeckY"):
+    extracted_features = []
+    for squat in squats:
+        features = []
+        features.extend(squat.ix[0].tolist())
+        mid_index = squat[key].values.argmax()
+        features.extend(squat.ix[mid_index].tolist())
+        features.extend(squat.ix[squat.shape[0]-1].tolist())
+        extracted_features.append(np.array(features))
+    return np.array(extracted_features)
 
 
 def extract_all(squats):
