@@ -18,15 +18,15 @@ class ActionVisualizer(object):
         self.data = data.read_data(data_path)
         self.data_frame = data.convert_data_into_DF(self.data, columns)
         self.indexs = segmentation.get_min_coords(self.data_frame.get("NeckY"), 10)
-        self._repeats = segmentation.segment_data_into_repeats(self.data_frame, key, mn=True, delta=10)
-        self.normalized_repeats = normalization.normalize([np.array(df) for df in self._repeats])
+        self._repeats = segmentation.segment_data_into_repeats(self.data_frame, key, mn=True, delta=50)
+        self.normalized_repeats = normalization.normalize(self._repeats)
 
     def test(self):
         self.draw_data_frame_with_split_lines(self.data_frame.get("NeckY"), self.indexs)
         #draw_reps(self.normalized_repeats)
         #self.draw_single_frame(self.normalized_repeats[0][0])
         #self.draw_repeat(self.normalized_repeats[0])
-        self.draw_repeat(np.array(self.data_frame))
+        #self.draw_repeat(np.array(self.data_frame))
 
     def draw_data_frame_with_split_lines(self, df, lines):
         plt.plot(df)
@@ -68,5 +68,5 @@ class ActionVisualizer(object):
         plt.show()
 
 if __name__ == '__main__':
-    visualizer = ActionVisualizer("./ai/data/squat_data/squatData12.txt")
+    visualizer = ActionVisualizer("./ai/data/raw_squat_data/squatData50.txt")
     visualizer.test()

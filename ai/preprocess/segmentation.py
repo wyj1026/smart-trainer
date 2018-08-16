@@ -7,7 +7,7 @@ from .data import read_data
 """
 对给定的坐标，找出其中最小的点用来分割动作
 """
-def get_min_coords(coords, delta):
+def get_min_coords(coords, delta, ctn=10):
     indexs = []
     min_coord = np.min(coords)
     i = 0
@@ -15,12 +15,14 @@ def get_min_coords(coords, delta):
     while i < np.size(coords):
         current_min_coord = np.max(coords)
         index = 0
+        continuation = 0
         while(i < np.size(coords) and abs(coords[i] - min_coord) < delta):
             if coords[i] < current_min_coord:
                 index = i
                 current_min_coord = coords[i]
             i = i + 1
-        if index:
+            continuation = continuation + 1
+        if index and continuation >= ctn:
             indexs.append(index)
         i = i + 1
     return indexs
