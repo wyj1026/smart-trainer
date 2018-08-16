@@ -10,7 +10,7 @@ from ai.preprocess import *
 from ai.data.joint_coords import columns
 from ai.features import pushup_features_extractor
 from ai.features import squat_features_extractor
-from ai.classification import *
+from ai.classification import classification
 
 class AI(object):
     def __init__(self):
@@ -99,8 +99,8 @@ class AI(object):
     def save_classifier(self):
         pass
 
-    def train_classifier(self, exercise):
-        classifier = None
+    def train_classifier(self, exercise="squat"):
+        classifier = classification.train_svm_classifier(self.features[exercise], [x[-3] for x in self.labels[exercise]])
         self.classifiers[exercise] = classifier
     
     def classify(self):
@@ -118,3 +118,5 @@ if __name__ == "__main__":
     #print(ai.features["squat"][0].shape)
     ai.repeats["squat"] = ai.load("./ai/data/squat_data.pk")
     ai.labels["squat"] = ai.load("./ai/data/squat_labels.pk")
+    ai.extract_features()
+    ai.train_classifier()
