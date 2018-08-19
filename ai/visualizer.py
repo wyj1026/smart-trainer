@@ -17,26 +17,29 @@ class ActionVisualizer(object):
         self.delta = delta
         self.data = data.read_data(data_path)
         self.data_frame = data.convert_data_into_DF(self.data, columns)
-        self.indexs = segmentation.get_min_coords(self.data_frame.get("NeckY"), 10)
+        self.indexs = segmentation.get_min_coords(self.data_frame.get(key), 50)
         self._repeats = segmentation.segment_data_into_repeats(self.data_frame, key, mn=True, delta=50)
         self.normalized_repeats = normalization.normalize(self._repeats)
 
     def test(self):
-        self.draw_data_frame_with_split_lines(self.data_frame.get("NeckY"), self.indexs)
+        self.draw_data_frame_with_split_lines(self.data_frame.get(self.key), self.indexs)
         #draw_reps(self.normalized_repeats)
-        #self.draw_single_frame(self.normalized_repeats[0][0])
-        #self.draw_repeat(self.normalized_repeats[0])
-        #self.draw_repeat(np.array(self.data_frame))
+        self.draw_single_frame(self.normalized_repeats[0].ix[0])
+        self.draw_repeat(np.array(self.normalized_repeats[0]))
+        self.draw_repeat(np.array(self.data_frame))
 
     def draw_data_frame_with_split_lines(self, df, lines):
         plt.plot(df)
+        plt.plot(np.gradient(df)*10)
+        #plt.plot(np.gradient(df*10))
         for l in lines:
             plt.axvline(l, color="r")
         plt.show()
 
-    def draw_reps(self, reps):
+    @staticmethod
+    def draw_reps(reps, key="NeckY"):
         for i in range(len(reps)):
-            plt.plot(reps[i], label=i)
+            plt.plot(reps[i].get(key), label=i)
         plt.legend(loc=0)
         plt.show()
 
@@ -48,6 +51,7 @@ class ActionVisualizer(object):
     def draw_single_frame(self, coords):
         x, y = self.get_xy(coords)
         plt.plot(x, y, linestyle='None', marker='o')
+        plt.legend(loc=0)
         plt.show()
 
     def draw_repeat(self, repeat):
@@ -68,5 +72,6 @@ class ActionVisualizer(object):
         plt.show()
 
 if __name__ == '__main__':
-    visualizer = ActionVisualizer("./ai/data/raw_squat_data/squatData50.txt")
+    visualizer = ActionVisualizer("./ai/data/raw_squat_data/squatData33.txt", key="NeckY")
+    #visualizer = ActionVisualizer("./ai/data/raw_squat_data/squatData50.txt", key="NeckY")
     visualizer.test()
