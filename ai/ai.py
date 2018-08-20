@@ -1,7 +1,9 @@
 # coding: utf-8
 
 import pickle
+import logging
 import sys
+
 sys.path.insert(0, "c:/Users/wangy/Desktop/smart-trainer/")
 
 import numpy as np
@@ -11,6 +13,8 @@ from ai.data.joint_coords import columns
 from ai.features import pushup_features_extractor
 from ai.features import squat_features_extractor
 from ai.classification import classification
+from ai.data.squat_labels import label_names as squat_label_names
+
 
 class AI(object):
     def __init__(self):
@@ -29,7 +33,7 @@ class AI(object):
         if exercise in self.data:
             self.data[exercise].extend(data.convert_data_into_DF(raw_data, columns))
         else:
-            self.data[exercise] = data.convert_data_into_DF(raw_data, columns)
+            self.data[exercise] = data.convert_data_into_DF(raw_data, squat_labels_column)
 
     """
     读取某目录下的所有文件
@@ -94,6 +98,8 @@ class AI(object):
 
         normalized_repeats = normalization.normalize(self.repeats[exercise])
         self.repeats[exercise] = normalized_repeats
+        self.labels[exercise] = data.convert_data_into_DF(self.labels[exercise], squat_label_names)
+
     
     """
     提取特征
@@ -111,29 +117,31 @@ class AI(object):
     """
     训练模型
     """
-    def train_classifier(self, exercise="squat"):
-        f = [s_f[0] for s_f in self.features[exercise]]
-        #f = np.array(list(map(lambda x: x[0], self.features[exercise])))
-        classifier = classification.train(f, [x[-2] for x in self.labels[exercise]])
-        self.classifiers[exercise] = classifier
+    def train_classifier(self, features=[], exercise="squat"):
+        for i in range(len(features)):
+            f = [s_f[i] for s_f in self.features[exercise]]
+            classifier = classification.train(f, self.labels[exercise].get(features[i]))
+            self.classifiers[exercise] = {}
+            self.classifiers[exercise][features[i]] = classifier
     
-    def classify(self):
+    def classify(self, exercise, repeat):
         pass
 
 
 if __name__ == "__main__":
     ai = AI()
-    #ai.read_raw_labels()
-    #ai.read_files("./ai/data/raw_squat_data/")
-    #ai.process_data(delta=30)
-    #ai.save("./ai/data/squat_data.pk", ai.repeats["squat"])
-    #ai.save("./ai/data/squat_labels.pk", ai.labels["squat"])
-    #ai.extract_features()
-    #print(ai.features["squat"][0].shape)
+    """
+    ai.read_raw_labels()
+    ai.read_files("./ai/data/raw_squat_data/")
+    ai.process_data(delta=30)
+    ai.save("./ai/data/squat_data.pk", ai.repeats["squat"])
+    ai.save("./ai/data/squat_labels.pk", ai.labels["squat"])
+    features = ["back_hip_angle", "depth"]
+    ai.extract_features(features=features)
+    ai.train_classifier(features=features)
+    """
     ai.repeats["squat"] = ai.load("./ai/data/squat_data.pk")
-    #from ai.visualizer import ActionVisualizer
-    #ActionVisualizer.draw_reps(ai.repeats["squat"])
-
     ai.labels["squat"] = ai.load("./ai/data/squat_labels.pk")
-    ai.extract_features()
-    ai.train_classifier()
+    features = ["stance_shoulder_width", "knees_over_toes", "bend_hips_knees", "back_hip_angle", "depth"]
+    ai.extract_features(features=features)
+    ai.train_classifier(features=features)

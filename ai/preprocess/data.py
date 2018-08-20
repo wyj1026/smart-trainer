@@ -40,7 +40,7 @@ def read_all_available_data(directory, endswith=".txt"):
 def convert_data_into_DF(data, columns):
     if data and len(data[0]) == len(columns):
         return pd.DataFrame(data, columns=columns)
-    
+
 
 """
 labels 与 data文件名 对应函数
