@@ -4,19 +4,18 @@ from sklearn import svm, metrics, linear_model, tree, model_selection
 from tpot import TPOTClassifier
 
 
-classifiers = [tree.DecisionTreeClassifier(max_depth=3, criterion="entropy")]
-
-def train(X, Y, classifiers=classifiers, test_size=0.2):
+def train(X, Y, test_size=0.2):
     trained_classifiers = []
-    for classifier in classifiers:
-        x_train, x_test, y_train, y_test = model_selection.train_test_split(X, Y, test_size=test_size)
-        classifier.fit(x_train, y_train)
-        
-        predicted = classifier.predict(x_test)
-        print("Classification report for classifier %s:\n%s\n"
-          % (classifier, metrics.classification_report(y_test, predicted)))
-        print("Confusion matrix:\n%s" % metrics.confusion_matrix(y_test, predicted))
-        trained_classifiers.append(classifier)
+    x_train, x_test, y_train, y_test = model_selection.train_test_split(X, Y, test_size=test_size)
+
+    classifier = tree.DecisionTreeClassifier(max_depth=3, criterion="entropy")
+    classifier.fit(x_train, y_train)
+    
+    predicted = classifier.predict(x_test)
+    print("Classification report for classifier %s:\n%s\n"
+        % (classifier, metrics.classification_report(y_test, predicted)))
+    print("Confusion matrix:\n%s" % metrics.confusion_matrix(y_test, predicted))
+    trained_classifiers.append(classifier)
     return trained_classifiers
 
 

@@ -33,7 +33,7 @@ class AI(object):
         if exercise in self.data:
             self.data[exercise].extend(data.convert_data_into_DF(raw_data, columns))
         else:
-            self.data[exercise] = data.convert_data_into_DF(raw_data, squat_labels_column)
+            self.data[exercise] = data.convert_data_into_DF(raw_data, columns)
 
     """
     读取某目录下的所有文件
@@ -108,24 +108,33 @@ class AI(object):
         if exercise == "squat":
             self.features[exercise] = squat_features_extractor.extract_features(self.repeats[exercise], features=features)
         
-    def load_classifier(self):
-        pass
-
-    def save_classifier(self):
-        pass
-
     """
     训练模型
     """
     def train_classifier(self, features=[], exercise="squat"):
+        self.classifiers[exercise] = {}
         for i in range(len(features)):
             f = [s_f[i] for s_f in self.features[exercise]]
             classifier = classification.train(f, self.labels[exercise].get(features[i]))
-            self.classifiers[exercise] = {}
             self.classifiers[exercise][features[i]] = classifier
     
-    def classify(self, exercise, repeat):
-        pass
+    def classify(self, exercise, raw_data, features=[], key="SpineBaseY", delta=50):
+        data_frame = data.convert_data_into_DF(raw_data, columns)
+        repeats = segmentation.segment_data_into_repeats(data_frame, key, mn=True, delta=delta)
+        normalized_repeats = normalization.normalize(repeats)
+        if exercise == "squat":
+            extracted_features = squat_features_extractor.extract_features(normalized_repeats, features=features)
+        classifiers = self.classifiers[exercise]
+
+        return [self.predict(features_list, features, classifiers) for features_list in extracted_features]
+
+    def predict(self, features_list, features, classifiers):
+        features = dict(zip(features, features_list))
+        result = []
+        for feature_name in features.keys():
+            if feature_name in classifiers.keys():
+                result.extend(classifiers[feature_name][0].predict([features[feature_name]]))
+        return result
 
 
 if __name__ == "__main__":
@@ -139,9 +148,17 @@ if __name__ == "__main__":
     features = ["back_hip_angle", "depth"]
     ai.extract_features(features=features)
     ai.train_classifier(features=features)
-    """
+
     ai.repeats["squat"] = ai.load("./ai/data/squat_data.pk")
     ai.labels["squat"] = ai.load("./ai/data/squat_labels.pk")
     features = ["stance_shoulder_width", "knees_over_toes", "bend_hips_knees", "back_hip_angle", "depth"]
     ai.extract_features(features=features)
     ai.train_classifier(features=features)
+    ai.save("./ai/classification/squat_classifiers.pk", ai.classifiers["squat"])
+    """
+    
+    ai.classifiers["squat"] = ai.load("./ai/classification/squat_classifiers.pk")
+    raw_data = data.read_data("./ai/data/raw_squat_data/squatData14.txt")
+    features = ["stance_shoulder_width", "knees_over_toes", "bend_hips_knees", "back_hip_angle", "depth"]
+    r = ai.classify("squat", raw_data, features)
+    print(r)
