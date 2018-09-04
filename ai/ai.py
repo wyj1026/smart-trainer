@@ -16,7 +16,7 @@ from ai.classification import classification
 from ai.data.squat_labels import label_names as squat_label_names
 
 
-class AI(object):
+class Trainer(object):
     def __init__(self):
         self.data = {}
         self.repeats = {}
@@ -143,7 +143,7 @@ class AI(object):
 
 
 if __name__ == "__main__":
-    ai = AI()
+    ai = Trainer()
     """
     ai.read_raw_labels()
     ai.read_files("./ai/data/raw_squat_data/")
