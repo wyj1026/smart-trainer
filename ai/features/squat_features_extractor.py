@@ -50,21 +50,21 @@ def extract_main_frames(squat, key="NeckY", gap_ratio=0.2):
 """
 提取蹲起的特征
 """
-def extract_features(squats, features=squat_features):
-    return [extract_features_from_squat(extract_main_frames(squat), features) for squat in squats]
+def extract_features(squats, targets=squat_features):
+    return [extract_features_from_squat(extract_main_frames(squat), targets) for squat in squats]
 
 
 """
 对于给定的squat， 以二维数组返回其所有的features，每一行为一个feature
 """
-def extract_features_from_squat(squat, features=squat_features):
+def extract_features_from_squat(squat, targets=squat_features):
     extracted_features = []
     features_funcs_dict = {}
     function_name = "extract_{}"
-    for feature_name in features:
+    for feature_name in targets:
         features_funcs_dict[feature_name] = globals().get(function_name.format(feature_name))
 
-    for feature_name in features:
+    for feature_name in targets:
         func = features_funcs_dict[feature_name]
         extracted_features.append(func(squat))
     return extracted_features
@@ -103,8 +103,8 @@ def extract_bend_hips_knees(squat):
 def extract_depth(squat, key="SpineBaseY"):
     features = []
     lowest = max(squat, key=lambda x: float(x[key]))
-    features.append(lowest["HipLeftY"])
-    features.append(lowest["HipRightY"])
+    features.append(float(lowest["HipLeftY"]))
+    features.append(float(lowest["HipRightY"]))
     left_angle = calculate_angle(lowest, "AnkleLeft", "KneeLeft", "HipLeft")
     right_angle = calculate_angle(lowest, "AnkleRight", "KneeRight", "HipRight")
     features.append(left_angle)

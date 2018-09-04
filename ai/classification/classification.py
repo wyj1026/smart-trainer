@@ -4,12 +4,21 @@ from sklearn import svm, metrics, linear_model, tree, model_selection
 from tpot import TPOTClassifier
 
 
-def train(X, Y, test_size=0.2):
+def train(X, Y, test_size=0.2, auto_ml=False, use_best_classifier=False, classifier_name=None):
     trained_classifiers = []
     x_train, x_test, y_train, y_test = model_selection.train_test_split(X, Y, test_size=test_size)
 
-    classifier = tree.DecisionTreeClassifier(max_depth=3, criterion="entropy")
-    classifier.fit(x_train, y_train)
+    if auto_ml:
+        classifier = TPOTClassifier(generations=6, verbosity=2)
+        classifier.fit(x_train, y_train)
+    elif use_best_classifier and classifier_name:
+        from ai.classification.best_classifiers import classifiers
+        estimator = classifiers[classifier_name].pop("estimator")
+        classifier = estimator(**classifiers[classifier_name])
+        classifier.fit(x_train, y_train)
+    else:
+        classifier = tree.DecisionTreeClassifier(max_depth=3, criterion="entropy")
+        classifier.fit(x_train, y_train)
     
     predicted = classifier.predict(x_test)
     print("Classification report for classifier %s:\n%s\n"
@@ -17,11 +26,3 @@ def train(X, Y, test_size=0.2):
     print("Confusion matrix:\n%s" % metrics.confusion_matrix(y_test, predicted))
     trained_classifiers.append(classifier)
     return trained_classifiers
-
-
-def find_best_classifier(X, Y, test_size=0.2):
-        x_train, x_test, y_train, y_test = model_selection.train_test_split(X, Y, test_size=test_size)
-        tpot = TPOTClassifier(generations=6, verbosity=2)
-        tpot.fit(x_train, y_train)
-        tpot.score(x_test, y_test)
-        tpot.export("tpot_pipeline.py")
