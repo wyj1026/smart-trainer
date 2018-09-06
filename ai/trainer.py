@@ -131,7 +131,7 @@ class Trainer(object):
         repeats = segmentation.segment_data_into_repeats(data_frame, key, mn=True, delta=delta)
         normalized_repeats = normalization.normalize(repeats)
         if exercise == "squat":
-            extracted_features = squat_features_extractor.extract_features(normalized_repeats, targets=self.targets)
+            extracted_features = squat_features_extractor.extract_features(repeats, targets=self.targets)
         classifiers = self.classifiers[exercise]
 
         return [self.predict(features_list, classifiers) for features_list in extracted_features]
@@ -159,6 +159,9 @@ if __name__ == "__main__":
     """
 
     ai.repeats["squat"] = ai.load("./ai/data/squat_data.pk")
+    #import pandas as pd
+    #pd.set_option('display.max_columns', None)
+    #print(ai.repeats["squat"][0].head())
     ai.labels["squat"] = ai.load("./ai/data/squat_labels.pk")
     ai.extract_features()
     ai.train_classifier(auto_ml=False, use_best_classifier=True)

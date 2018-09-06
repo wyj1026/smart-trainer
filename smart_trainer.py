@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from ai.ai import Trainer
+from ai.trainer import Trainer
 from ai.preprocess import *
 from ai.data.joint_coords import columns
 from ai.suggestions import squat_suggestions
