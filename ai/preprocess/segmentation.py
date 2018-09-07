@@ -3,13 +3,40 @@
 import numpy as np
 from .data import read_data
 
+def drop_automatically(data_frame, column, delta):
+    coords = data_frame.get(column)
+    coords = np.array(coords)
+    coord_indexs = get_min_coords(coords, delta, use_aver=True)
+    average = np.mean([data_frame.iloc[index].get(column) for index in coord_indexs])
+    i = 0
+    while i < np.size(coords):
+        if abs(coords[i]-average) <= 5:
+            s = i
+            break
+        else:
+            i += 1
+    i = -1
+    while abs(i) < np.size(coords):
+        if coords[i]-average >= 5:
+            e = i
+            break
+        else:
+            i -= 1
+    data_frame.drop([i for i in range(s)], inplace=True)
+    data_frame.drop([i for i in range(np.size(coords) + e, np.size(coords))], inplace=True)
+    data_frame.reset_index(drop=True, inplace=True)
+    return data_frame
+
 
 """
 对给定的坐标，找出其中最小的点用来分割动作
 """
-def get_min_coords(coords, delta, ctn=10):
+def get_min_coords(coords, delta, ctn=10, use_aver=False):
     indexs = []
-    min_coord = np.min(coords)
+    if use_aver:
+        min_coord = np.mean(coords)
+    else:
+        min_coord = np.min(coords)
     i = 0
     index = 0
     while i < np.size(coords):
@@ -22,8 +49,11 @@ def get_min_coords(coords, delta, ctn=10):
                 current_min_coord = coords[i]
             i = i + 1
             continuation = continuation + 1
-        if index and continuation >= ctn:
-            indexs.append(index)
+        if continuation >= ctn:
+            if indexs and index-indexs[-1] >20:
+                indexs.append(index)
+            elif not indexs:
+                indexs.append(index)
         i = i + 1
     return indexs
 
@@ -62,12 +92,12 @@ def repeat_tunning(coords, index):
 那么从每个x-delta开始会更新一个最大值，根据不同的动作可能需要修改
 mn表示是否以最小值划分
 """
-def segment_data_into_repeats(data_frame, column, mn=True, delta=20):
+def segment_data_into_repeats(data_frame, column, mn=True, delta=20, ctn=10):
     repeats = []
     coords = data_frame.get(column)
     coords = np.array(coords)
     if mn:
-        coord_indexs = get_min_coords(coords, delta)
+        coord_indexs = get_min_coords(coords, delta, ctn=ctn)
     else:
         coord_indexs = get_max_coords(coords, delta)
     

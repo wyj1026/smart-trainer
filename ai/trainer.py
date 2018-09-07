@@ -71,7 +71,7 @@ class Trainer(object):
     """
     对原始的数据进行处理
     """
-    def process_data(self, exercise="squat", column="SpineBaseY", delta=50):
+    def process_data(self, exercise="squat", column="SpineBaseY", delta=50, ctn=10):
         if not exercise in self.data:
             return
         self.repeats[exercise] = []
@@ -79,10 +79,12 @@ class Trainer(object):
         raw_data = self.data[exercise]
         raw_labels = self.raw_labels[exercise]
         for label_key in raw_labels.keys():
-            data_keys = data.data_labels_key_map(label_key)
+            data_keys = data.data_labels_key_map(label_key, exercise)
             repeats = []
             for data_key in data_keys:
-                repeats.extend(segmentation.segment_data_into_repeats(raw_data[data_key], column, mn=True, delta=delta))
+                if exercise=="pushup":
+                    raw_data[data_key] = segmentation.drop_automatically(raw_data[data_key], column, delta=delta)
+                repeats.extend(segmentation.segment_data_into_repeats(raw_data[data_key], column, mn=True, delta=delta, ctn=ctn))
             if not len(repeats) == len(raw_labels[label_key]):
                 print("label: {} SEGMENTATION ERROR! {} repeats with {} labels".format(
                     label_key,
@@ -148,7 +150,16 @@ class Trainer(object):
 if __name__ == "__main__":
     targets = ["stance_shoulder_width", "knees_over_toes", "bend_hips_knees", "back_hip_angle", "depth"]
     ai = Trainer(targets)
+    ai.read_raw_labels("pushup")
+    ai.read_files("./ai/data/raw_pushup_data/", exercise="pushup")
+    ai.process_data(delta=26, exercise="pushup", ctn=3)
+    ai.save("./ai/data/pushup_data.pk", ai.repeats["pushup"])
+    #ai.save("./ai/data/pushup_labels.pk", ai.labels["pushup"])
+    #ai.extract_features()
+    #ai.train_classifier()
     """
+    targets = ["stance_shoulder_width", "knees_over_toes", "bend_hips_knees", "back_hip_angle", "depth"]
+    ai = Trainer(targets)
     ai.read_raw_labels()
     ai.read_files("./ai/data/raw_squat_data/")
     ai.process_data(delta=30)
@@ -158,6 +169,7 @@ if __name__ == "__main__":
     ai.train_classifier()
     """
 
+    """
     ai.repeats["squat"] = ai.load("./ai/data/squat_data.pk")
     #import pandas as pd
     #pd.set_option('display.max_columns', None)
@@ -167,6 +179,7 @@ if __name__ == "__main__":
     ai.train_classifier(auto_ml=False, use_best_classifier=True)
     ai.save("./ai/classification/squat_classifiers.pk", ai.classifiers["squat"])
 
+    """
     """
     # 使用
     ai.classifiers["squat"] = ai.load("./ai/classification/squat_classifiers.pk")

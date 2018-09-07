@@ -12,25 +12,26 @@ from ai.preprocess import *
 from ai.data.joint_coords import columns
 
 class ActionVisualizer(object):
-    def __init__(self, data_path, key="NeckY", delta=10):
+    def __init__(self, data_path, key="NeckY", delta=10, ctn=10):
         self.key = key
         self.delta = delta
         self.data = data.read_data(data_path)
         self.data_frame = data.convert_data_into_DF(self.data, columns)
-        self.indexs = segmentation.get_min_coords(self.data_frame.get(key), 50)
+        self.data_frame = segmentation.drop_automatically(self.data_frame, key, delta)
+        self.indexs = segmentation.get_min_coords(self.data_frame.get(key), delta, ctn=ctn)
         self._repeats = segmentation.segment_data_into_repeats(self.data_frame, key, mn=True, delta=50)
-        self.normalized_repeats = normalization.normalize(self._repeats)
+        #self.normalized_repeats = normalization.normalize(self._repeats)
 
     def test(self):
         self.draw_data_frame_with_split_lines(self.data_frame.get(self.key), self.indexs)
         #draw_reps(self.normalized_repeats)
-        self.draw_single_frame(self.normalized_repeats[0].ix[0])
-        self.draw_repeat(np.array(self.normalized_repeats[0]))
+        #self.draw_single_frame(self.normalized_repeats[0].ix[0])
+        #self.draw_repeat(np.array(self.normalized_repeats[0]))
         self.draw_repeat(np.array(self.data_frame))
 
     def draw_data_frame_with_split_lines(self, df, lines):
         plt.plot(df)
-        plt.plot(np.gradient(df)*10)
+        #plt.plot(np.gradient(df)*10)
         #plt.plot(np.gradient(df*10))
         for l in lines:
             plt.axvline(l, color="r")
@@ -72,6 +73,10 @@ class ActionVisualizer(object):
         plt.show()
 
 if __name__ == '__main__':
-    visualizer = ActionVisualizer("./ai/data/raw_squat_data/squatData33.txt", key="NeckY")
-    #visualizer = ActionVisualizer("./ai/data/raw_squat_data/squatData50.txt", key="NeckY")
+    visualizer = ActionVisualizer("./ai/data/raw_pushup_data/pushupData15.txt", key="SpineBaseY", delta=26, ctn=3)
+    #visualizer = ActionVisualizer("./ai/data/raw_squat_data/squatData50txt", key="NeckY")
     visualizer.test()
+    with open("./ai/data/pushup_data.pk", "rb") as f:
+        import pickle
+        b = pickle.load(f)
+    visualizer.draw_reps(b,"SpineBaseY")
