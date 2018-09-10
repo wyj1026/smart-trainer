@@ -57,9 +57,9 @@ if __name__ == "__main__":
     recognizer.repeats.extend(squats)
     recognizer.labels = [1]*len(squats)
 
-    pushups = recognizer.load("./ai/data/squat_data.pk")
+    pushups = recognizer.load("./ai/data/pushup_data.pk")
     recognizer.repeats.extend(pushups)
-    recognizer.labels = [0]*len(pushups)
+    recognizer.labels.extend([0]*len(pushups))
 
     recognizer.extract_features()
     recognizer.train_classifier(auto_ml=False, use_best_classifier=True)

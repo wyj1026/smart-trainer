@@ -1,8 +1,12 @@
 from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import GradientBoostingClassifier, ExtraTreesClassifier
 
 
 classifiers = {
+    "exercise": {
+        "estimator": GaussianNB
+    },
     "stance_shoulder_width": {
         "estimator": GradientBoostingClassifier,
         "learning_rate": 0.1,
