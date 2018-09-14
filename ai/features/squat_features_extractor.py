@@ -31,7 +31,9 @@ def calculate_angle(squat_frame, left_point_name, central_point_name, right_poin
     a = calculate_distance(left_point, central_point)
     b = calculate_distance(right_point, central_point)
     c = calculate_distance(left_point, right_point)
-    return math.acos(abs(a*a + b*b - c*c)/(2*b*c+0.01))
+    cos = min(abs(a*a+b*b-c*c)/(2*b*c), 1)
+    cos = max(cos, -1)
+    return math.acos(cos)
 
 
 """

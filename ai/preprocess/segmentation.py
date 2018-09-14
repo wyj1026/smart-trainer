@@ -50,7 +50,7 @@ def get_min_coords(coords, delta, ctn=10, use_aver=False):
             i = i + 1
             continuation = continuation + 1
         if continuation >= ctn:
-            if indexs and index-indexs[-1] >20:
+            if indexs and index-indexs[-1] > 10:
                 indexs.append(index)
             elif not indexs:
                 indexs.append(index)
@@ -100,7 +100,7 @@ def segment_data_into_repeats(data_frame, column, mn=True, delta=20, ctn=10):
         coord_indexs = get_min_coords(coords, delta, ctn=ctn)
     else:
         coord_indexs = get_max_coords(coords, delta)
-    
+
     if coord_indexs:
         start = coord_indexs[0]
         for i in range(1, len(coord_indexs)):

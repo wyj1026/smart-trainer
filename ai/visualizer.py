@@ -17,17 +17,17 @@ class ActionVisualizer(object):
         self.delta = delta
         self.data = data.read_data(data_path)
         self.data_frame = data.convert_data_into_DF(self.data, columns)
-        self.data_frame = segmentation.drop_automatically(self.data_frame, key, delta)
+        #self.data_frame = segmentation.drop_automatically(self.data_frame, key, delta)
         self.indexs = segmentation.get_min_coords(self.data_frame.get(key), delta, ctn=ctn)
         self._repeats = segmentation.segment_data_into_repeats(self.data_frame, key, mn=True, delta=50)
         #self.normalized_repeats = normalization.normalize(self._repeats)
 
     def test(self):
         self.draw_data_frame_with_split_lines(self.data_frame.get(self.key), self.indexs)
-        #draw_reps(self.normalized_repeats)
+        #self.draw_reps(self.normalized_repeats)
         #self.draw_single_frame(self.normalized_repeats[0].ix[0])
         #self.draw_repeat(np.array(self.normalized_repeats[0]))
-        self.draw_repeat(np.array(self.data_frame))
+        #self.draw_repeat(np.array(self.data_frame))
 
     def draw_data_frame_with_split_lines(self, df, lines):
         plt.plot(df)
@@ -45,8 +45,8 @@ class ActionVisualizer(object):
         plt.show()
 
     def get_xy(self, coords):
-        x = [-1*coords[i] for i in range(0, coords.size) if i % 3 == 0]
-        y = [-1*coords[i] for i in range(0, coords.size) if i % 3 == 1]
+        x = [coords[i] for i in range(0, coords.size) if i % 3 == 0]
+        y = [coords[i] for i in range(0, coords.size) if i % 3 == 1]
         return x, y
 
     def draw_single_frame(self, coords):
@@ -69,14 +69,15 @@ class ActionVisualizer(object):
             budy.set_data(x, y)
             return budy
     
-        ani = animation.FuncAnimation(fig=fig, func=update, init_func=init, frames=frames, interval=50)
+        ani = animation.FuncAnimation(fig=fig, func=update, init_func=init, frames=frames, interval=100)
         plt.show()
 
 if __name__ == '__main__':
-    visualizer = ActionVisualizer("./ai/data/raw_pushup_data/pushupData15.txt", key="SpineBaseY", delta=26, ctn=3)
-    #visualizer = ActionVisualizer("./ai/data/raw_squat_data/squatData50txt", key="NeckY")
+    #visualizer = ActionVisualizer("./ai/data/raw_pushup_data/pushupData15.txt", key="SpineBaseY", delta=26, ctn=3)
+    visualizer = ActionVisualizer("./ai/data/raw_squat_data/squatData34.txt", key="SpineBaseY", delta=30)
+    #visualizer = ActionVisualizer("./ai/data/squat_test.txt", key="SpineBaseY", ctn=1)
     visualizer.test()
-    with open("./ai/data/pushup_data.pk", "rb") as f:
-        import pickle
-        b = pickle.load(f)
-    visualizer.draw_reps(b,"SpineBaseY")
+    #with open("./ai/data/pushup_data.pk", "rb") as f:
+    #    import pickle
+    #    b = pickle.load(f)
+    #visualizer.draw_reps(b,"SpineBaseY")
