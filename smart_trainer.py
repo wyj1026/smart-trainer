@@ -56,7 +56,7 @@ if __name__ == "__main__":
     ai = RealTimeTrainer(targets=targets)
     ai.load_classifier("squat", path)
     #print(ai.classifiers)
-    test_data = data.read_data("./ai/data/squat_test.txt")
+    test_data = data.read_data("./ai/data/squat_test/squatData2.txt")
     #test_data = data.read_data("./ai/data/raw_squat_data/squatData35.txt")
     for frame in test_data:
         r = ai.update("squat", [frame], accept_suggestions=True, processing=True, delta=10, ctn=1)

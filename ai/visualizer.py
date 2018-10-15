@@ -10,6 +10,9 @@ sys.path.insert(0, "c:/Users/wangy/Desktop/smart-trainer/")
 from matplotlib import animation
 from ai.preprocess import *
 from ai.data.joint_coords import columns
+from matplotlib.font_manager import FontProperties
+
+font = FontProperties(fname=r"c:\windows\fonts\simsun.ttc", size=14)
 
 class ActionVisualizer(object):
     def __init__(self, data_path, key="NeckY", delta=10, ctn=10):
@@ -17,31 +20,38 @@ class ActionVisualizer(object):
         self.delta = delta
         self.data = data.read_data(data_path)
         self.data_frame = data.convert_data_into_DF(self.data, columns)
-        #self.data_frame = segmentation.drop_automatically(self.data_frame, key, delta)
+        self.data_frame = segmentation.drop_automatically(self.data_frame, key, delta)
         self.indexs = segmentation.get_min_coords(self.data_frame.get(key), delta, ctn=ctn)
         self._repeats = segmentation.segment_data_into_repeats(self.data_frame, key, mn=True, delta=50)
-        #self.normalized_repeats = normalization.normalize(self._repeats)
+        self.normalized_repeats = normalization.normalize(self._repeats)
 
     def test(self):
         self.draw_data_frame_with_split_lines(self.data_frame.get(self.key), self.indexs)
         #self.draw_reps(self.normalized_repeats)
         #self.draw_single_frame(self.normalized_repeats[0].ix[0])
-        #self.draw_repeat(np.array(self.normalized_repeats[0]))
+        self.draw_repeat(np.array(-self.normalized_repeats[0]))
         #self.draw_repeat(np.array(self.data_frame))
 
     def draw_data_frame_with_split_lines(self, df, lines):
-        plt.plot(df)
+        plt.plot(-1*df, color="#000000")
         #plt.plot(np.gradient(df)*10)
         #plt.plot(np.gradient(df*10))
         for l in lines:
-            plt.axvline(l, color="r")
+            plt.axvline(l, color="r", linestyle="dashed")
+        plt.xlabel(u'运动帧', fontproperties=font)
+        plt.ylabel(u'脊柱高度', fontproperties=font, rotation='horizontal', verticalalignment='center')
         plt.show()
 
     @staticmethod
     def draw_reps(reps, key="NeckY"):
         for i in range(len(reps)):
-            plt.plot(reps[i].get(key), label=i)
+            if i == 4 or i == 9:
+                continue
+            plt.plot(-reps[i].get(key), label='R' + str(i))
         plt.legend(loc=0)
+        plt.xlabel(u'运动帧', fontproperties=font)
+        plt.ylabel(u'脊柱高度', fontproperties=font, rotation='horizontal', verticalalignment='center')
+        plt.show()
         plt.show()
 
     def get_xy(self, coords):
@@ -71,11 +81,13 @@ class ActionVisualizer(object):
     
         ani = animation.FuncAnimation(fig=fig, func=update, init_func=init, frames=frames, interval=100)
         plt.show()
+        #writer = animation.FFMpegWriter()
+        #ani.save('./repeat.gif', writer=writer)
 
 if __name__ == '__main__':
-    #visualizer = ActionVisualizer("./ai/data/raw_pushup_data/pushupData15.txt", key="SpineBaseY", delta=26, ctn=3)
-    visualizer = ActionVisualizer("./ai/data/raw_squat_data/squatData34.txt", key="SpineBaseY", delta=30)
-    #visualizer = ActionVisualizer("./ai/data/squat_test.txt", key="SpineBaseY", ctn=1)
+    visualizer = ActionVisualizer("./ai/data/raw_pushup_data/pushupData12.txt", key="SpineBaseY", delta=26, ctn=3)
+    #visualizer = ActionVisualizer("./ai/data/raw_squat_data/squatData19.txt", key="SpineBaseY", delta=30)
+    #visualizer = ActionVisualizer("./ai/data/squat_test/squatData2.txt", key="SpineBaseY", ctn=1)
     visualizer.test()
     #with open("./ai/data/pushup_data.pk", "rb") as f:
     #    import pickle

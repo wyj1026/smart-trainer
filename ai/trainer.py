@@ -116,7 +116,7 @@ class Trainer(object):
     """
     训练模型
     """
-    def train_classifier(self, exercise="squat", auto_ml=False, use_best_classifier=False):
+    def train_classifier(self, exercise="squat", auto_ml=False, use_best_classifier=False, plot_curve=False):
         self.classifiers[exercise] = {}
         for i in range(len(self.targets)):
             f = [s_f[i] for s_f in self.features[exercise]]
@@ -127,6 +127,8 @@ class Trainer(object):
                 use_best_classifier=use_best_classifier,
                 classifier_name=self.targets[i])
             self.classifiers[exercise][self.targets[i]] = classifier
+            if use_best_classifier and plot_curve:
+                classification.plot_learning_curve(f, self.labels[exercise].get(self.targets[i]), self.targets[i])
     
     def classify(self, exercise, raw_data, key="SpineBaseY", delta=50, ctn=10):
         data_frame = data.convert_data_into_DF(raw_data, columns)
@@ -177,7 +179,7 @@ if __name__ == "__main__":
     #print(ai.repeats["squat"][0].head())
     ai.labels["squat"] = ai.load("./ai/data/squat_labels.pk")
     ai.extract_features()
-    ai.train_classifier(auto_ml=False, use_best_classifier=True)
+    ai.train_classifier(auto_ml=False, use_best_classifier=True, plot_curve=False)
     ai.save("./ai/classification/squat_classifiers.pk", ai.classifiers["squat"])
 
     """"
